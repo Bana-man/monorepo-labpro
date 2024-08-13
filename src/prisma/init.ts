@@ -7,6 +7,7 @@ async function main() {
   // Seed data untuk tabel User
   const user = await prisma.user.create({
     data: {
+      role: 'ADMIN',
       email: 'admin@example.com',
       username: 'admin',
       firstName: 'Admin',

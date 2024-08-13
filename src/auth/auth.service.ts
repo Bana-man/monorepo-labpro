@@ -6,6 +6,7 @@ import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { LoginAuthDto } from './dto/login-auth.dto';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
+import { Role } from '@prisma/client';
 
 @Injectable()
 export class AuthService {
@@ -27,7 +28,7 @@ export class AuthService {
                 },
             });
 
-            return this.signToken(user.id, user.email);
+            return this.signToken(user.id, user.username, user.role);
 
         } catch (error) {
             // If email or username not unique
@@ -71,13 +72,14 @@ export class AuthService {
             );
         }
 
-        return this.signToken(user.id, user.email);
+        return this.signToken(user.id, user.username, user.role);
     }
 
-    async signToken(userId: number, email: string): Promise<{access_token: string}> {
+    async signToken(userId: number, username: string, role: Role): Promise<{access_token: string}> {
         const payload = {
             sub: userId,
-            email,
+            username,
+            role,
         }
 
         const token = await this.jwt.signAsync(payload, {

@@ -1,7 +1,5 @@
-import { ForbiddenException, Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { User } from '@prisma/client';
-import { AuthService } from 'src/auth/auth.service';
 import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
@@ -9,9 +7,6 @@ export class UserService {
     constructor(private prisma: PrismaService, private config: ConfigService) {}
 
     async getSelf(username: string, token: string) {
-        console.log({
-            username,
-        })
         return {
             username: username,
             token: token,
@@ -35,7 +30,7 @@ export class UserService {
 
         // User not found
         if (!user) {
-            throw new ForbiddenException(
+            throw new NotFoundException(
                 'User not found.',
             );
         }
@@ -60,7 +55,7 @@ export class UserService {
 
         // User not found
         if (!user) {
-            throw new ForbiddenException(
+            throw new NotFoundException(
                 'User not found.',
             );
         }
@@ -85,7 +80,7 @@ export class UserService {
             })
             return user;
         } catch {
-            throw new ForbiddenException(
+            throw new NotFoundException(
                 'User not found.',
             );
         }
@@ -102,7 +97,7 @@ export class UserService {
             })
             return user;
         } catch {
-            throw new ForbiddenException(
+            throw new NotFoundException(
                 'User not found.',
             );
         }

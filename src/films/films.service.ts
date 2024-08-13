@@ -1,4 +1,4 @@
-import { ForbiddenException, Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { FilmDto } from './dto';
 import { User } from '@prisma/client';
@@ -48,7 +48,7 @@ export class FilmService {
 
         // User not found
         if (!film) {
-            throw new ForbiddenException(
+            throw new NotFoundException(
                 'Film not found.',
             );
         }
@@ -65,12 +65,36 @@ export class FilmService {
 
         // User not found
         if (!film) {
-            throw new ForbiddenException(
+            throw new NotFoundException(
                 'Film not found.',
             );
         }
         
         return film;
+    }
+
+    async updateFilm(id: number, dto: FilmDto) {
+        const existingFilm = await this.prisma.film.findUnique({ where: { id } });
+        if (!existingFilm) {
+            throw new NotFoundException('Film not found');
+        }
+
+        // Handle video file upload
+        if (!dto.video_url) {
+            dto.video_url = existingFilm.video_url;
+        }
+
+        // Handle cover image upload
+        if (!dto.cover_image_url) {
+            dto.cover_image_url = existingFilm.cover_image_url;
+        }
+
+        return this.prisma.film.update({
+            where: { id },
+            data: {
+                ...dto
+            },
+        });
     }
 
     async deleteFilm(id: number) {
@@ -80,9 +104,11 @@ export class FilmService {
                     id: id,
                 }
             })
+
+            return film;
         } catch {
-            throw new ForbiddenException(
-                'User not found.',
+            throw new NotFoundException(
+                'Film not found.',
             );
         }
     }

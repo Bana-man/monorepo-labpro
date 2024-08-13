@@ -1,7 +1,9 @@
 import { Body, Controller, Delete, Get, Headers, Param, ParseIntPipe, Post, Query, UseGuards } from '@nestjs/common';
-import { AuthGuard } from 'src/auth/guard';
+import { AuthGuard, RolesGuard } from 'src/auth/guard';
 import { UserService } from './users.service';
 import { GetUser } from 'src/auth/decorator/get-user.decorator';
+import { Roles } from 'src/auth/decorator/roles.decorator';
+import { Role } from '@prisma/client';
 
 @Controller('self')
 export class SelfController {
@@ -9,20 +11,18 @@ export class SelfController {
     @UseGuards(AuthGuard)
     @Get()
     getSelf(
-        @GetUser('id') username: string,
+        @GetUser('username') username: string,
         @Headers('Authorization') token: string,
     ) {
-        console.log({
-            username,
-        })
         return this.userService.getSelf(username, token);
     }
 }
 
 @Controller('users')
+@UseGuards(AuthGuard, RolesGuard)
+@Roles(Role.ADMIN)
 export class UserController {
     constructor( private userService: UserService ) {}
-    @UseGuards(AuthGuard)
     @Get()
     searchUsername(
         @Query('username') username: string
