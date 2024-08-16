@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { FilmDto } from './dto';
 import { User } from '@prisma/client';
+import { responseTemp } from 'src/response/response';
 
 @Injectable()
 export class FilmService {
@@ -32,9 +33,9 @@ export class FilmService {
             });
 
             delete film.ownerId;
-            return film;
+            return new responseTemp('success', 'Film created', film);
         } catch (error) {
-            throw error;
+            return new responseTemp('error', 'Create film failed', null);
         }
     }
 
@@ -48,35 +49,32 @@ export class FilmService {
 
         // User not found
         if (!film) {
-            throw new NotFoundException(
-                'Film not found.',
-            );
+            return new responseTemp('error', 'Film not found', null);
         }
         
-        return film;
+        return new responseTemp('success', 'Film found', film);
     }
 
     async getFilm(id: number) {
-        const film = await this.prisma.film.findMany({
+        const film = await this.prisma.film.findUnique({
             where: {
                 id: id,
             },
         })
 
-        // User not found
+        // Film not found
         if (!film) {
-            throw new NotFoundException(
-                'Film not found.',
-            );
+            return new responseTemp('error', 'Film not found', null);
         }
         
-        return film;
+        delete film.ownerId;
+        return new responseTemp('success', 'Film found', film);
     }
 
     async updateFilm(id: number, dto: FilmDto) {
         const existingFilm = await this.prisma.film.findUnique({ where: { id } });
         if (!existingFilm) {
-            throw new NotFoundException('Film not found');
+            return new responseTemp('error', 'Film not found', null);
         }
 
         // Handle video file upload
@@ -89,12 +87,14 @@ export class FilmService {
             dto.cover_image_url = existingFilm.cover_image_url;
         }
 
-        return this.prisma.film.update({
+        const film = await this.prisma.film.update({
             where: { id },
             data: {
                 ...dto
             },
         });
+
+        return new responseTemp('success', 'Film updated', film);
     }
 
     async deleteFilm(id: number) {
@@ -105,11 +105,9 @@ export class FilmService {
                 }
             })
 
-            return film;
+            return new responseTemp('success', 'Film deleted', film);
         } catch {
-            throw new NotFoundException(
-                'Film not found.',
-            );
+            return new responseTemp('error', 'Film not found', null);
         }
     }
 }

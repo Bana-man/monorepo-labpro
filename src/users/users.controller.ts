@@ -5,11 +5,11 @@ import { GetUser } from 'src/auth/decorator/get-user.decorator';
 import { Roles } from 'src/auth/decorator/roles.decorator';
 import { Role } from '@prisma/client';
 
-@Controller('self')
+@Controller()
 export class SelfController {
     constructor( private userService: UserService ) {}
     @UseGuards(AuthGuard)
-    @Get()
+    @Get('self')
     getSelf(
         @GetUser('username') username: string,
         @Headers('Authorization') token: string,

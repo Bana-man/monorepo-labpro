@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100 flex items-center justify-center h-screen">
+  <div class="w-full max-w-md">
+    <h2 class="text-center text-2xl font-bold mb-6">Login</h2>
+    <form id="loginForm" class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
+      <div class="mb-4">
+        <label class="block text-gray-700 text-sm font-bold mb-2" for="email">Email</label>
+        <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="email" type="text" placeholder="Email">
+      </div>
+      <div class="mb-6">
+        <label class="block text-gray-700 text-sm font-bold mb-2" for="password">Password</label>
+        <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 mb-3 leading-tight focus:outline-none focus:shadow-outline" id="password" type="password" placeholder="********">
+      </div>
+      <div class="flex items-center justify-between">
+        <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="button" onclick="loginUser()">
+          Login
+        </button>
+      </div>
+    </form>
+    <div id="outputMessage"></div>
+  </div>
+
+  <script>
+    async function loginUser() {
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+
+      const response = await fetch('/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const result = await response.json();
+      const outputDiv = document.getElementById('outputMessage');
+
+      if (response.ok) {
+        localStorage.setItem('token', result.access_token); // Store the JWT token
+
+        const statusMessage = document.createElement('p');
+        statusMessage.textContent = 'Login successful!';
+        statusMessage.classList.add('text-center text-green-500');
+        outputDiv.appendChild(statusMessage);
+        // Redirect to browse page or dashboard
+        window.location.href = '/register.html';
+      } else {
+        const messages = result.message;
+        messages.for(message => {
+            const statusMessage = document.createElement('p');
+            statusMessage.textContent = message;
+            statusMessage.classList.add('text-red-500');
+            outputDiv.appendChild(statusMessage);
+        });
+      }
+    }
+  </script>
+</body>
+</html>

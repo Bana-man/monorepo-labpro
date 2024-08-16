@@ -1,12 +1,12 @@
-import { ForbiddenException, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { RegisterAuthDto } from './dto';
 import * as argon from 'argon2'
-import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { LoginAuthDto } from './dto/login-auth.dto';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { Role } from '@prisma/client';
+import { responseTemp } from 'src/response/response';
 
 @Injectable()
 export class AuthService {
@@ -28,19 +28,15 @@ export class AuthService {
                 },
             });
 
-            return this.signToken(user.id, user.username, user.role);
+            const data = {
+                username: user.username,
+                token: await this.signToken(user.id, user.username, user.role),
+            }
+            return new responseTemp('success', 'Successfully registered', data);
 
         } catch (error) {
             // If email or username not unique
-            if (error instanceof PrismaClientKnownRequestError) {
-                if (error.code === 'P2002') {
-                    throw new ForbiddenException(
-                        'The ' + error.meta.target[0] + ' has already been used.',
-                    );
-                }
-            }
-
-            throw error;
+            return new responseTemp('error', 'The ' + error.meta.target[0] + ' has already been used', null);
         }
     }
 
@@ -48,15 +44,13 @@ export class AuthService {
         // Finding user with the given email
         const user = await this.prisma.user.findUnique({
             where: {
-                email: dto.email,
+                username: dto.username,
             }
         })
 
         // User not found
         if (!user) {
-            throw new ForbiddenException(
-                'Email not registered yet.',
-            );
+            return new responseTemp('error', 'Username not registered yet', null);
         }
 
         // Comparing password
@@ -67,15 +61,17 @@ export class AuthService {
 
         // Incorrect Password
         if (!pwMatches) {
-            throw new ForbiddenException(
-                'Incorrect Password.',
-            );
+            return new responseTemp('error', 'Incorrect password', null);
         }
 
-        return this.signToken(user.id, user.username, user.role);
+        const data = {
+            username: user.username,
+            token: await this.signToken(user.id, user.username, user.role),
+        }
+        return new responseTemp('success', 'Login success', data);
     }
 
-    async signToken(userId: number, username: string, role: Role): Promise<{access_token: string}> {
+    async signToken(userId: number, username: string, role: Role) {
         const payload = {
             sub: userId,
             username,
@@ -84,10 +80,8 @@ export class AuthService {
 
         const token = await this.jwt.signAsync(payload, {
             secret: this.config.get('JWT_SECRET'),
-        })
+        });
 
-        return {
-            access_token: token,
-        }
+        return token;
     }
 }

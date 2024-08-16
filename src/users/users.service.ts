@@ -1,16 +1,19 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { responseTemp } from 'src/response/response';
 
 @Injectable()
 export class UserService {
     constructor(private prisma: PrismaService, private config: ConfigService) {}
 
     async getSelf(username: string, token: string) {
-        return {
+
+        const data = {
             username: username,
             token: token,
         }
+        return new responseTemp('success', '', data);
     }
 
     async searchUser(
@@ -30,12 +33,10 @@ export class UserService {
 
         // User not found
         if (!user) {
-            throw new NotFoundException(
-                'User not found.',
-            );
+            return new responseTemp('error', 'User not found', null);
         }
         
-        return user;
+        return new responseTemp('success', 'User found', user);
     }
 
     async getUser(
@@ -55,12 +56,10 @@ export class UserService {
 
         // User not found
         if (!user) {
-            throw new NotFoundException(
-                'User not found.',
-            );
+            return new responseTemp('error', 'User not found', null);
         }
         
-        return user;
+        return new responseTemp('success', 'User found', user);
     }
 
     async editBalance(
@@ -78,11 +77,9 @@ export class UserService {
                     }
                 },
             })
-            return user;
+            return new responseTemp('success', 'User found', user);
         } catch {
-            throw new NotFoundException(
-                'User not found.',
-            );
+            return new responseTemp('error', 'User not found', null);
         }
     }
 
@@ -95,11 +92,9 @@ export class UserService {
                     id: userId,
                 },
             })
-            return user;
+            return new responseTemp('success', 'User found', user);
         } catch {
-            throw new NotFoundException(
-                'User not found.',
-            );
+            return new responseTemp('error', 'User not found', null);
         }
     }
 }
