@@ -39,11 +39,13 @@ export class FilmService {
         }
     }
 
-    async searchFilm(title: string, director: string) {
+    async searchFilm(q: string) {
         const film = await this.prisma.film.findMany({
             where: {
-                title: title,
-                director: director,
+                OR: [
+                    { title: { contains: q, mode: 'insensitive' }},
+                    { director: { contains: q, mode: 'insensitive' }},
+                ]
             },
         })
 

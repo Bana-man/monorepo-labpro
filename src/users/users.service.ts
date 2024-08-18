@@ -16,24 +16,14 @@ export class UserService {
     }
 
     async searchUser(
-        username: string
+        q: string
     ) {
-        if (!username) {
-            const data = await this.prisma.user.findFirst({
-                select: {
-                    id: true,
-                    username: true,
-                    email: true,
-                    balance: true,
-                },
-            });
-            console.log(data);
-            return new responseTemp('success', 'All User returned', data);
-        }
-
-        const user = await this.prisma.user.findUnique({
+        const user = await this.prisma.user.findMany({
             where: {
-                username: username,
+                username: {
+                    contains: q,
+                    mode: 'insensitive'
+                }
             },
             select: {
                 id: true,
@@ -44,10 +34,9 @@ export class UserService {
         })
 
         // User not found
-        if (!user) {
+        if (user.length === 0) {
             return new responseTemp('error', 'User not found', null);
         }
-        console.log(user);
         return new responseTemp('success', 'User found', user);
     }
 

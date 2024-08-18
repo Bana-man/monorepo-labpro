@@ -19,8 +19,8 @@ export class FilmController {
     }
 
     @Get()
-    searchFilm(@Query('title') title: string, @Query('director') director: string) {
-        return this.filmService.searchFilm(title, director);
+    searchFilm(@Query('q') q: string) {
+        return this.filmService.searchFilm(q);
     }
 
     @Get(':id')
