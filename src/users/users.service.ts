@@ -1,11 +1,10 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
+import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { responseTemp } from 'src/response/response';
 
 @Injectable()
 export class UserService {
-    constructor(private prisma: PrismaService, private config: ConfigService) {}
+    constructor(private prisma: PrismaService) {}
 
     async getSelf(username: string, token: string) {
 
@@ -19,6 +18,19 @@ export class UserService {
     async searchUser(
         username: string
     ) {
+        if (!username) {
+            const data = await this.prisma.user.findFirst({
+                select: {
+                    id: true,
+                    username: true,
+                    email: true,
+                    balance: true,
+                },
+            });
+            console.log(data);
+            return new responseTemp('success', 'All User returned', data);
+        }
+
         const user = await this.prisma.user.findUnique({
             where: {
                 username: username,
@@ -35,12 +47,12 @@ export class UserService {
         if (!user) {
             return new responseTemp('error', 'User not found', null);
         }
-        
+        console.log(user);
         return new responseTemp('success', 'User found', user);
     }
 
     async getUser(
-        userId: number
+        userId: string
     ) {
         const user = await this.prisma.user.findUnique({
             where: {
@@ -63,7 +75,7 @@ export class UserService {
     }
 
     async editBalance(
-        userId: number,
+        userId: string,
         increment: number,
     ) {
         try {
@@ -84,7 +96,7 @@ export class UserService {
     }
 
     async deleteUser(
-        userId: number
+        userId: string
     ) {
         try {
             const user = await this.prisma.user.delete({

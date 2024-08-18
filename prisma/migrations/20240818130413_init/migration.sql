@@ -3,7 +3,7 @@ CREATE TYPE "Role" AS ENUM ('USER', 'ADMIN');
 
 -- CreateTable
 CREATE TABLE "User" (
-    "id" SERIAL NOT NULL,
+    "id" TEXT NOT NULL,
     "role" "Role" NOT NULL DEFAULT 'USER',
     "email" TEXT NOT NULL,
     "username" TEXT NOT NULL,
@@ -17,7 +17,7 @@ CREATE TABLE "User" (
 
 -- CreateTable
 CREATE TABLE "Film" (
-    "id" SERIAL NOT NULL,
+    "id" TEXT NOT NULL,
     "title" TEXT NOT NULL,
     "description" TEXT NOT NULL,
     "director" TEXT NOT NULL,
@@ -29,7 +29,7 @@ CREATE TABLE "Film" (
     "cover_image_url" TEXT,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "ownerId" INTEGER NOT NULL,
+    "ownerId" TEXT NOT NULL,
 
     CONSTRAINT "Film_pkey" PRIMARY KEY ("id")
 );

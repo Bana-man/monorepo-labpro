@@ -4,6 +4,7 @@ import { UserService } from './users.service';
 import { GetUser } from 'src/auth/decorator/get-user.decorator';
 import { Roles } from 'src/auth/decorator/roles.decorator';
 import { Role } from '@prisma/client';
+import { RedisService } from 'src/redis/redis.service';
 
 @Controller()
 export class SelfController {
@@ -22,33 +23,43 @@ export class SelfController {
 @UseGuards(AuthGuard, RolesGuard)
 @Roles(Role.ADMIN)
 export class UserController {
-    constructor( private userService: UserService ) {}
+    constructor( private userService: UserService, private redis: RedisService ) {}
     @Get()
-    searchUsername(
-        @Query('username') username: string
+    async searchUsername(
+        @Query('q') username: string
     ) {
         return this.userService.searchUser(username);
     }
 
     @Get(':id')
-    searchId(
-        @Param('id', ParseIntPipe) userId: number
+    async searchId(
+        @Param('id') userId: string
     ) {
-        return this.userService.getUser(userId);
+        const result = await this.redis.get('user:${userId}');
+        if (result) {
+            return result;
+        }
+        
+        const data = this.userService.getUser(userId);
+        this.redis.set('user:${userId}', data);
+        return data;
     }
 
     @Post(':id/balance')
     editBalance(
-        @Param('id', ParseIntPipe) userId: number,
+        @Param('id') userId: string,
         @Body('increment', ParseIntPipe) increment: number
     ) {
-        return this.userService.editBalance(userId, increment);
+        const data = this.userService.editBalance(userId, increment);
+        this.redis.set('user:${userId}', data);
+        return data;
     }
 
     @Delete(':id')
     deleteId(
-        @Param('id', ParseIntPipe) userId: number
+        @Param('id') userId: string
     ) {
+        this.redis.del('user:${userId}')
         return this.userService.deleteUser(userId);
     }
 }

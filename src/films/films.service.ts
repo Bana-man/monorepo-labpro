@@ -55,7 +55,7 @@ export class FilmService {
         return new responseTemp('success', 'Film found', film);
     }
 
-    async getFilm(id: number) {
+    async getFilm(id: string) {
         const film = await this.prisma.film.findUnique({
             where: {
                 id: id,
@@ -71,7 +71,7 @@ export class FilmService {
         return new responseTemp('success', 'Film found', film);
     }
 
-    async updateFilm(id: number, dto: FilmDto) {
+    async updateFilm(id: string, dto: FilmDto) {
         const existingFilm = await this.prisma.film.findUnique({ where: { id } });
         if (!existingFilm) {
             return new responseTemp('error', 'Film not found', null);
@@ -97,7 +97,7 @@ export class FilmService {
         return new responseTemp('success', 'Film updated', film);
     }
 
-    async deleteFilm(id: number) {
+    async deleteFilm(id: string) {
         try {
             const film = await this.prisma.film.delete({
                 where: {

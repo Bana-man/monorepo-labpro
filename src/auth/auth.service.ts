@@ -71,7 +71,7 @@ export class AuthService {
         return new responseTemp('success', 'Login success', data);
     }
 
-    async signToken(userId: number, username: string, role: Role) {
+    async signToken(userId: string, username: string, role: Role) {
         const payload = {
             sub: userId,
             username,

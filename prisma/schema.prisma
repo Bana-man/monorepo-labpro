@@ -14,7 +14,7 @@ datasource db {
 }
 
 model User {
-  id        Int      @id @default(autoincrement())
+  id        String   @id @default(uuid())
   role      Role     @default(USER)
   email     String   @unique
   username  String   @unique
@@ -30,7 +30,7 @@ enum Role {
 }
 
 model Film {
-  id              Int      @id @default(autoincrement())
+  id              String      @id @default(uuid())
   title           String
   description     String
   director        String
@@ -42,6 +42,6 @@ model Film {
   cover_image_url String?
   created_at      DateTime  @default(now())
   updated_at      DateTime  @default(now())
-  ownerId         Int
+  ownerId         String
   owner           User     @relation(fields: [ownerId], references: [id])
 }

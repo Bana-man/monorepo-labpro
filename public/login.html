@@ -11,8 +11,8 @@
     <h2 class="text-center text-2xl font-bold mb-6">Login</h2>
     <form id="loginForm" class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
       <div class="mb-4">
-        <label class="block text-gray-700 text-sm font-bold mb-2" for="email">Email</label>
-        <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="email" type="text" placeholder="Email">
+        <label class="block text-gray-700 text-sm font-bold mb-2" for="username">Username</label>
+        <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="username" type="text" placeholder="Username">
       </div>
       <div class="mb-6">
         <label class="block text-gray-700 text-sm font-bold mb-2" for="password">Password</label>
@@ -24,12 +24,12 @@
         </button>
       </div>
     </form>
-    <div id="outputMessage"></div>
+    <p id="statusMessage" class="text-center text-red-500"></p>
   </div>
 
   <script>
     async function loginUser() {
-      const email = document.getElementById('email').value;
+      const username = document.getElementById('username').value;
       const password = document.getElementById('password').value;
 
       const response = await fetch('/login', {
@@ -37,7 +37,7 @@
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ username, password }),
       });
 
       const result = await response.json();
@@ -45,21 +45,13 @@
 
       if (response.ok) {
         localStorage.setItem('token', result.access_token); // Store the JWT token
-
-        const statusMessage = document.createElement('p');
         statusMessage.textContent = 'Login successful!';
-        statusMessage.classList.add('text-center text-green-500');
-        outputDiv.appendChild(statusMessage);
-        // Redirect to browse page or dashboard
-        window.location.href = '/register.html';
+        statusMessage.classList.remove('text-red-500');
+        statusMessage.classList.add('text-green-500');
+        window.location.href = '/browse.html';
       } else {
-        const messages = result.message;
-        messages.for(message => {
-            const statusMessage = document.createElement('p');
-            statusMessage.textContent = message;
-            statusMessage.classList.add('text-red-500');
-            outputDiv.appendChild(statusMessage);
-        });
+        console.log("abc")
+        statusMessage.textContent = result.message || 'Login failed!';
       }
     }
   </script>
