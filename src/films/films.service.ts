@@ -22,13 +22,7 @@ export class FilmService {
                     duration: dto.duration,
                     video_url: dto.video_url,
                     cover_image_url: dto.cover_image_url,
-                    owner: {
-                        connect: {
-                            id: user.id,
-                            email: user.email,
-                            username: user.username
-                        }
-                    },
+                    ownerId: user.id,
                 },
             });
 
