@@ -39,16 +39,16 @@
         },
         body: JSON.stringify({ username, password }),
       });
-
+      
       const result = await response.json();
       const outputDiv = document.getElementById('outputMessage');
 
-      if (response.ok) {
-        localStorage.setItem('token', result.access_token); // Store the JWT token
+      if (response.ok && result.status === 'success') {
+        localStorage.setItem('Authorization', result.data.token); // Store the JWT token
         statusMessage.textContent = 'Login successful!';
         statusMessage.classList.remove('text-red-500');
         statusMessage.classList.add('text-green-500');
-        window.location.href = '/browse.html';
+        window.location.href = '/dashboard';
       } else {
         statusMessage.textContent = result.message || 'Login failed!';
       }

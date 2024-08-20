@@ -26,10 +26,10 @@ CREATE TABLE "Film" (
     "price" INTEGER NOT NULL,
     "duration" INTEGER NOT NULL,
     "video_url" TEXT NOT NULL,
-    "cover_image_url" TEXT,
+    "cover_image_url" TEXT NOT NULL DEFAULT 'uploads/cover_images/placeholder.svg',
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "ownerId" TEXT NOT NULL,
+    "ownerId" TEXT,
 
     CONSTRAINT "Film_pkey" PRIMARY KEY ("id")
 );
@@ -41,4 +41,4 @@ CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
 CREATE UNIQUE INDEX "User_username_key" ON "User"("username");
 
 -- AddForeignKey
-ALTER TABLE "Film" ADD CONSTRAINT "Film_ownerId_fkey" FOREIGN KEY ("ownerId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "Film" ADD CONSTRAINT "Film_ownerId_fkey" FOREIGN KEY ("ownerId") REFERENCES "User"("id") ON DELETE SET NULL ON UPDATE CASCADE;

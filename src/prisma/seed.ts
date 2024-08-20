@@ -16,14 +16,6 @@ async function main() {
         password: await argon.hash('passadmin'),
       },
       {
-        role: 'ADMIN',
-        email: 'admin-backup@example.com',
-        username: 'admin-backup',
-        firstName: 'Admin',
-        lastName: 'User',
-        password: await argon.hash('passadmin'),
-      },
-      {
         role: 'USER',
         email: 'user1@example.com',
         username: 'user1',
@@ -50,23 +42,42 @@ async function main() {
     ]
   });
 
+  const admin = await prisma.user.findUnique({
+    where: {
+      username: 'admin',
+    }
+  });
+
+  const loop = 7;
   // Seed data untuk FILM
-  await prisma.film.createMany({
-    data: [
-      {
-        title: 'ABCDEF',
-        description: 'desc',
-        director: 'X',
-        releaseYear: 2024,
-        genre: ['Gen1', 'Gen2'],
-        price: 100,
-        duration: 100,
-        video_url: '/uploads/videos/video1.mp4',
-        cover_image_url: '/uploads/cover_images/image1.jpg',
-        ownerId: null
-      },
-    ]
-  })
+  for (let i = 1; i <= loop; i++) {
+    await prisma.film.createMany({
+      data: [
+        {
+          title: 'ABCDEF',
+          description: 'desc',
+          director: 'X',
+          releaseYear: 2024,
+          genre: ['Gen1', 'Gen2'],
+          price: 100,
+          duration: 100,
+          video_url: '/uploads/videos/video1.mp4',
+          cover_image_url: '/uploads/cover_images/image1.jpg',
+        },
+        {
+          title: 'EFGHIJ',
+          description: 'desc lgi',
+          director: 'XMan',
+          releaseYear: 2024,
+          genre: ['Rawr'],
+          price: 120,
+          duration: 200,
+          video_url: '/uploads/videos/video1.mp4',
+          cover_image_url: '/uploads/cover_images/image1.jpg',
+        },
+      ]
+    })
+  }
 
   
 }

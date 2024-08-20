@@ -1,5 +1,5 @@
 export class responseTemp {
-    status: 'success'|'error'; message: string; data: any;
+    status: 'success'|'error'; message: string; public data: any;
 
     constructor( status: 'success'|'error', message: string, data: any ) {
         this.status = status;

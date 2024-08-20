@@ -30,7 +30,7 @@ export class AuthService {
 
             const data = {
                 username: user.username,
-                token: await this.signToken(user.id, user.username, user.role),
+                token: await this.signToken(user.id, user.username, user.balance, user.role),
             }
             return new responseTemp('success', 'Successfully registered', data);
 
@@ -42,13 +42,16 @@ export class AuthService {
 
     async login(dto: LoginAuthDto) {
         // Finding user with the given email
-        const user = await this.prisma.user.findUnique({
+        const user = await this.prisma.user.findFirst({
             where: {
-                username: dto.username,
+                OR: [
+                    { username: dto.username },
+                    { email: dto.username },
+                ]
             }
         })
 
-        // User not found
+        // Username not found
         if (!user) {
             return new responseTemp('error', 'Username not registered yet', null);
         }
@@ -66,15 +69,16 @@ export class AuthService {
 
         const data = {
             username: user.username,
-            token: await this.signToken(user.id, user.username, user.role),
+            token: await this.signToken(user.id, user.username, user.balance, user.role),
         }
         return new responseTemp('success', 'Login success', data);
     }
 
-    async signToken(userId: string, username: string, role: Role) {
+    async signToken(userId: string, username: string, balance: number, role: Role) {
         const payload = {
             sub: userId,
             username,
+            balance,
             role,
         }
 

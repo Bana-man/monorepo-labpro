@@ -24,6 +24,7 @@ model User {
   balance   Int    @default(0)
   films     Film[]
 }
+
 enum Role {
   USER
   ADMIN
@@ -39,9 +40,9 @@ model Film {
   price           Int
   duration        Int
   video_url       String
-  cover_image_url String?
+  cover_image_url String    @default("uploads/cover_images/placeholder.svg")
   created_at      DateTime  @default(now())
   updated_at      DateTime  @default(now())
-  ownerId         String
-  owner           User     @relation(fields: [ownerId], references: [id])
+  ownerId         String?
+  owner           User?     @relation(fields: [ownerId], references: [id])
 }

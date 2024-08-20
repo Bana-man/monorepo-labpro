@@ -1,10 +1,11 @@
 import { Module } from '@nestjs/common';
 import { UserService } from './users.service';
 import { SelfController, UserController } from './users.controller';
-import { RolesGuard } from 'src/auth/guard/roles.guard';
+import { AuthGuard, RolesGuard } from 'src/auth/guard';
+import { FilmService } from 'src/films/films.service';
 
 @Module({
-  providers: [UserService, RolesGuard],
+  providers: [UserService, FilmService, AuthGuard, RolesGuard],
   controllers: [UserController, SelfController]
 })
 export class UserModule {}

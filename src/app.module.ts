@@ -4,10 +4,12 @@ import { AuthModule } from './auth/auth.module';
 import { FilmModule } from './films/films.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { ConfigModule } from '@nestjs/config';
-import { APP_GUARD } from '@nestjs/core';
-import { RolesGuard } from './auth/guard/roles.guard';
-import { AuthGuard } from './auth/guard';
-import { RedisModule } from './redis/redis.module';
+import { AppController } from './app.controller';
+import { FilmController } from './films/films.controller';
+import { UserController } from './users/users.controller';
+import { UserService } from './users/users.service';
+import { FilmService } from './films/films.service';
+// import { RedisModule } from './redis/redis.module';
 
 @Module({
   imports: [
@@ -15,10 +17,15 @@ import { RedisModule } from './redis/redis.module';
     AuthModule, 
     FilmModule, 
     PrismaModule, 
-    ConfigModule.forRoot({ isGlobal: true }), 
-    RedisModule,
+    ConfigModule.forRoot({ isGlobal: true }),
+    // RedisModule,
   ],
-  controllers: [],
-  providers: [],
+  controllers: [
+    UserController, FilmController, AppController,
+  ],
+  providers: [
+    UserService, FilmService,
+  ],
+  
 })
 export class AppModule {}

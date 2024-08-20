@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { FilmDto } from './dto';
 import { User } from '@prisma/client';
@@ -63,7 +63,6 @@ export class FilmService {
             return new responseTemp('error', 'Film not found', null);
         }
         
-        delete film.ownerId;
         return new responseTemp('success', 'Film found', film);
     }
 
@@ -89,6 +88,8 @@ export class FilmService {
                 ...dto
             },
         });
+
+        console.log(film);
 
         return new responseTemp('success', 'Film updated', film);
     }

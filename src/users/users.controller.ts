@@ -4,18 +4,38 @@ import { UserService } from './users.service';
 import { GetUser } from 'src/auth/decorator/get-user.decorator';
 import { Roles } from 'src/auth/decorator/roles.decorator';
 import { Role } from '@prisma/client';
-import { RedisService } from 'src/redis/redis.service';
+import { FilmService } from 'src/films/films.service';
+// import { RedisService } from 'src/redis/redis.service';
 
-@Controller()
+@Controller('self')
+@UseGuards(AuthGuard)
 export class SelfController {
-    constructor( private userService: UserService ) {}
-    @UseGuards(AuthGuard)
-    @Get('self')
+    constructor( private userService: UserService, private filmService: FilmService ) {}
+    
+    @Get()
     getSelf(
         @GetUser('username') username: string,
         @Headers('Authorization') token: string,
     ) {
         return this.userService.getSelf(username, token);
+    }
+
+    @Get('buy/:id')
+    async buyFilm(
+        @GetUser('sub') userId: string,
+        @Param('id') filmId: string
+    ){
+        const dataFilm = (await this.filmService.getFilm(filmId)).data
+
+        // Ubah kepemilikan film
+        dataFilm.ownerId = userId;
+        console.log(dataFilm);
+        const resp = this.filmService.updateFilm(filmId, dataFilm);
+
+        // Mengubah nilai balance user
+        const data = this.userService.editBalance(userId, -dataFilm.price);
+        // this.redis.set('user:${userId}', data);
+        return data;
     }
 }
 
@@ -23,7 +43,10 @@ export class SelfController {
 @UseGuards(AuthGuard, RolesGuard)
 @Roles(Role.ADMIN)
 export class UserController {
-    constructor( private userService: UserService, private redis: RedisService ) {}
+    constructor( 
+        private userService: UserService, 
+        // private redis: RedisService 
+    ) {}
     @Get()
     async searchUsername(
         @Query('q') username: string
@@ -35,13 +58,13 @@ export class UserController {
     async searchId(
         @Param('id') userId: string
     ) {
-        const result = await this.redis.get('user:${userId}');
-        if (result) {
-            return result;
-        }
+        // const result = await this.redis.get('user:${userId}');
+        // if (result) {
+        //     return result;
+        // }
         
         const data = this.userService.getUser(userId);
-        this.redis.set('user:${userId}', data);
+        // this.redis.set('user:${userId}', data);
         return data;
     }
 
@@ -51,7 +74,7 @@ export class UserController {
         @Body('increment', ParseIntPipe) increment: number
     ) {
         const data = this.userService.editBalance(userId, increment);
-        this.redis.set('user:${userId}', data);
+        // this.redis.set('user:${userId}', data);
         return data;
     }
 
@@ -59,7 +82,7 @@ export class UserController {
     deleteId(
         @Param('id') userId: string
     ) {
-        this.redis.del('user:${userId}')
+        // this.redis.del('user:${userId}')
         return this.userService.deleteUser(userId);
     }
 }

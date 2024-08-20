@@ -1,4 +1,4 @@
-import { ArrayMinSize, ArrayNotEmpty, IsArray, IsNotEmpty, IsNumber, IsOptional, IsPositive, IsString, IsUrl } from "class-validator";
+import { ArrayMinSize, ArrayNotEmpty, IsArray, IsNotEmpty, IsNumber, IsOptional, IsPositive, isString, IsString, IsUrl } from "class-validator";
 
 export class FilmDto {
     @IsNotEmpty()
@@ -42,4 +42,8 @@ export class FilmDto {
     @IsString()
     @IsUrl()
     cover_image_url: string;
+
+    @IsString()
+    @IsOptional()
+    ownerId: string;
 }

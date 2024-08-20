@@ -6,8 +6,8 @@
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
-    "prisma:migrate": "npx prisma migrate deploy",
-    "prisma:seed": "ts-node src/prisma/init.ts",
+    "prisma:migrate": "npx prisma migrate reset",
+    "prisma:seed": "ts-node src/prisma/seed.ts",
     "prisma:setup": "npm run prisma:migrate && npm run prisma:seed",
     "db:rm": "docker compose rm postgres -s -f -v",
     "db:up": "docker compose up postgres -d",
