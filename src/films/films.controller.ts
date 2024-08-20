@@ -17,8 +17,8 @@ export class FilmController {
     @UseGuards(AuthGuard, RolesGuard)
     @Roles(Role.ADMIN)
     @Post()
-    createFilm( @Body() dto: FilmDto, @GetUser() user: User ) {
-        return this.filmService.createFilm(dto, user);
+    createFilm( @Body() dto: FilmDto ) {
+        return this.filmService.createFilm(dto);
     }
 
     @Get()

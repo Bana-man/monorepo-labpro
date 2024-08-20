@@ -4,9 +4,9 @@ import * as argon from 'argon2'
 const prisma = new PrismaClient();
 
 async function main() {
-  // Seed data untuk USER
-  await prisma.user.createMany({
-    data: [
+  // Seed data untuk ADMIN
+  await prisma.user.create({
+    data:
       {
         role: 'ADMIN',
         email: 'admin@example.com',
@@ -15,46 +15,31 @@ async function main() {
         lastName: 'User',
         password: await argon.hash('passadmin'),
       },
-      {
-        role: 'USER',
-        email: 'user1@example.com',
-        username: 'user1',
-        firstName: 'User',
-        lastName: 'User',
-        password: await argon.hash('passuser'),
-      },
-      {
-        role: 'USER',
-        email: 'user2@example.com',
-        username: 'user2',
-        firstName: 'User',
-        lastName: 'User',
-        password: await argon.hash('passuser'),
-      },
-      {
-        role: 'USER',
-        email: 'user3@example.com',
-        username: 'user3',
-        firstName: 'User',
-        lastName: 'User',
-        password: await argon.hash('passuser'),
-      },
-    ]
   });
 
-  const admin = await prisma.user.findUnique({
-    where: {
-      username: 'admin',
-    }
-  });
+  // Seed data untuk USER
+  const loopUser = 7;
+  for (let i = 1; i <= loopUser; i++) {
+    await prisma.user.create({
+      data:
+        {
+          role: 'USER',
+          email: `user${i}@example.com`,
+          username: `user${i}`,
+          firstName: 'User',
+          lastName: 'User',
+          password: await argon.hash('passuser'),
+        }
+    })
+  }
 
-  const loop = 7;
   // Seed data untuk FILM
-  for (let i = 1; i <= loop; i++) {
+  const loopFilm = 7;
+  for (let i = 1; i <= loopFilm; i++) {
     await prisma.film.createMany({
       data: [
         {
-          title: 'ABCDEF',
+          title: `Judul ${i}`,
           description: 'desc',
           director: 'X',
           releaseYear: 2024,

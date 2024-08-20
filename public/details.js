@@ -53,6 +53,11 @@ function parseJwt(token) {
     }
 }
 
+// Mengecek apakah user telah membeli film
+function hasUserPurchasedFilm(film, userId) {
+    return film.owners.some(owner => owner.id === userId);
+}
+
 async function checkFilmStatus() {
     try {
         const response = await fetch(`/films/${filmId}`, {
@@ -62,25 +67,19 @@ async function checkFilmStatus() {
             }
         });
         const result = await response.json();
-
-        console.log(`Sub: ${user.sub}`);
-        console.log(`Id: ${result.ownerId}`);
+        
         if (!token) {
             statusElement.textContent = 'Login to buy or watch this film.';
             buyButton.style.display = 'none';
             watchButton.style.display = 'none';
-        } else if (!result.data.ownerId) {
+        } else if (!hasUserPurchasedFilm(result.data, user.sub)) {
             statusElement.textContent = 'Not purchased this film yet.';
             buyButton.style.display = 'block';
             watchButton.style.display = 'none';
-        } else if (result.ownerId === user.sub) {
+        } else {
             statusElement.textContent = 'Already purchased this film.';
             buyButton.style.display = 'none';
             watchButton.style.display = 'block';
-        } else {
-            statusElement.textContent = 'Already purchased by other user.';
-            buyButton.style.display = 'none';
-            watchButton.style.display = 'none';
         }
 
         buyButton.addEventListener('click', () => {

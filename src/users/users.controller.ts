@@ -10,7 +10,7 @@ import { FilmService } from 'src/films/films.service';
 @Controller('self')
 @UseGuards(AuthGuard)
 export class SelfController {
-    constructor( private userService: UserService, private filmService: FilmService ) {}
+    constructor( private userService: UserService ) {}
     
     @Get()
     getSelf(
@@ -25,16 +25,12 @@ export class SelfController {
         @GetUser('sub') userId: string,
         @Param('id') filmId: string
     ){
-        const dataFilm = (await this.filmService.getFilm(filmId)).data
-
-        // Ubah kepemilikan film
-        dataFilm.ownerId = userId;
-        console.log(dataFilm);
-        const resp = this.filmService.updateFilm(filmId, dataFilm);
-
+        const film = (await this.userService.addOwnerToFilm(userId, filmId)).data;
+        console.log(film);
         // Mengubah nilai balance user
-        const data = this.userService.editBalance(userId, -dataFilm.price);
+        const data = this.userService.editBalance(userId, -film.price);
         // this.redis.set('user:${userId}', data);
+        console.log(data);
         return data;
     }
 }

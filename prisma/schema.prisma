@@ -21,8 +21,8 @@ model User {
   firstName String
   lastName  String
   password  String
-  balance   Int    @default(0)
-  films     Film[]
+  balance   Int      @default(0)
+  films     Film[]   @relation("FilmOwnership")
 }
 
 enum Role {
@@ -43,6 +43,5 @@ model Film {
   cover_image_url String    @default("uploads/cover_images/placeholder.svg")
   created_at      DateTime  @default(now())
   updated_at      DateTime  @default(now())
-  ownerId         String?
-  owner           User?     @relation(fields: [ownerId], references: [id])
+  owners          User[]    @relation("FilmOwnership")
 }

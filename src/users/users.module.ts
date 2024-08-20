@@ -5,7 +5,7 @@ import { AuthGuard, RolesGuard } from 'src/auth/guard';
 import { FilmService } from 'src/films/films.service';
 
 @Module({
-  providers: [UserService, FilmService, AuthGuard, RolesGuard],
+  providers: [UserService, AuthGuard, RolesGuard],
   controllers: [UserController, SelfController]
 })
 export class UserModule {}

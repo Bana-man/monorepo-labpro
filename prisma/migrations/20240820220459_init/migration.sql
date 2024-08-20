@@ -29,9 +29,14 @@ CREATE TABLE "Film" (
     "cover_image_url" TEXT NOT NULL DEFAULT 'uploads/cover_images/placeholder.svg',
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "ownerId" TEXT,
 
     CONSTRAINT "Film_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "_FilmOwnership" (
+    "A" TEXT NOT NULL,
+    "B" TEXT NOT NULL
 );
 
 -- CreateIndex
@@ -40,5 +45,14 @@ CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
 -- CreateIndex
 CREATE UNIQUE INDEX "User_username_key" ON "User"("username");
 
+-- CreateIndex
+CREATE UNIQUE INDEX "_FilmOwnership_AB_unique" ON "_FilmOwnership"("A", "B");
+
+-- CreateIndex
+CREATE INDEX "_FilmOwnership_B_index" ON "_FilmOwnership"("B");
+
 -- AddForeignKey
-ALTER TABLE "Film" ADD CONSTRAINT "Film_ownerId_fkey" FOREIGN KEY ("ownerId") REFERENCES "User"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE "_FilmOwnership" ADD CONSTRAINT "_FilmOwnership_A_fkey" FOREIGN KEY ("A") REFERENCES "Film"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "_FilmOwnership" ADD CONSTRAINT "_FilmOwnership_B_fkey" FOREIGN KEY ("B") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;

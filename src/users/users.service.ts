@@ -15,6 +15,19 @@ export class UserService {
         return new responseTemp('success', '', data);
     }
 
+    async addOwnerToFilm(userId: string, filmId: string) {
+        const film = await this.prisma.film.update({
+            where: { id: filmId },
+            data: {
+                owners: {
+                    connect: { id: userId }
+                }
+            }
+        });
+
+        return new responseTemp('success', 'User added to Film', film);
+    }    
+
     async searchUser(
         q: string
     ) {
@@ -75,7 +88,7 @@ export class UserService {
                 data: {
                     balance: {
                         increment: increment
-                    }
+                    },
                 },
             })
             return new responseTemp('success', 'User found', user);

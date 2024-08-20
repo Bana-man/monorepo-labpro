@@ -8,7 +8,7 @@ import { responseTemp } from 'src/response/response';
 export class FilmService {
     constructor( private prisma: PrismaService ) {}
 
-    async createFilm(dto: FilmDto, user: User) {
+    async createFilm(dto: FilmDto) {
         try {
             // Create film in database
             const film = await this.prisma.film.create({
@@ -22,11 +22,9 @@ export class FilmService {
                     duration: dto.duration,
                     video_url: dto.video_url,
                     cover_image_url: dto.cover_image_url,
-                    ownerId: user.id,
                 },
             });
 
-            delete film.ownerId;
             return new responseTemp('success', 'Film created', film);
         } catch (error) {
             return new responseTemp('error', 'Create film failed', null);
@@ -56,6 +54,9 @@ export class FilmService {
             where: {
                 id: id,
             },
+            include: {
+                owners: true,
+            }
         })
 
         // Film not found
@@ -63,6 +64,7 @@ export class FilmService {
             return new responseTemp('error', 'Film not found', null);
         }
         
+        console.log(film);
         return new responseTemp('success', 'Film found', film);
     }
 
@@ -85,7 +87,10 @@ export class FilmService {
         const film = await this.prisma.film.update({
             where: { id },
             data: {
-                ...dto
+                ...dto,
+                updated_at: {
+                    set: new Date(),
+                }
             },
         });
 
