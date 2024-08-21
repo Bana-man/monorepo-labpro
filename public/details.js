@@ -66,7 +66,9 @@ async function checkFilmStatus() {
                 'Content-Type': 'application/json'
             }
         });
+        console.log(response);
         const result = await response.json();
+        console.log(result);
         
         if (!token) {
             statusElement.textContent = 'Login to buy or watch this film.';
@@ -102,7 +104,16 @@ async function checkFilmStatus() {
 }
 
 async function handleBuyFilm(data) {
-    if (user.balance < data.price) {
+    const entry = await fetch(`/users/${user.sub}`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    });
+    const result = await entry.json();
+    console.log(result);
+
+    if (result.data.balance < data.price) {
         statusElement.textContent = 'Your balance is not enough.';
     } else {
         await fetch(`/self/buy/${filmId}`, {

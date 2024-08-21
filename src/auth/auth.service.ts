@@ -30,9 +30,9 @@ export class AuthService {
 
             const data = {
                 username: user.username,
-                token: await this.signToken(user.id, user.username, user.balance, user.role),
+                token: await this.signToken(user.id, user.username, user.role),
             }
-            return new responseTemp('success', 'Successfully registered', data);
+            return new responseTemp('success', 'User found', data);
 
         } catch (error) {
             // If email or username not unique
@@ -69,16 +69,15 @@ export class AuthService {
 
         const data = {
             username: user.username,
-            token: await this.signToken(user.id, user.username, user.balance, user.role),
+            token: await this.signToken(user.id, user.username, user.role),
         }
         return new responseTemp('success', 'Login success', data);
     }
 
-    async signToken(userId: string, username: string, balance: number, role: Role) {
+    async signToken(userId: string, username: string, role: Role) {
         const payload = {
             sub: userId,
             username,
-            balance,
             role,
         }
 

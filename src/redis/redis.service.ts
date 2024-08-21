@@ -6,13 +6,19 @@ export class RedisService {
     constructor(@Inject(CACHE_MANAGER) private cache: Cache) {}
 
     async get(key: string) {
-        console.log('GET ${key} from REDIS');
-        return await this.cache.get(key);
+        console.log(`GET ${key} from REDIS`);
+        const data = await this.cache.get(key);
+        console.log(data);
+        if (typeof data === 'string' && data) {
+            return JSON.parse(data);
+        } 
+        console.log("MISS2!")
+        return null;
     }
 
     async set(key: string, value: any) {
-        console.log('SET ${key} from REDIS');
-        await this.cache.set(key, value);
+        console.log(`SET ${key} from REDIS`);
+        await this.cache.set(key, JSON.stringify(value));
     }
 
     async del(key: string) {

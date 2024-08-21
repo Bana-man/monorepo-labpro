@@ -23,6 +23,11 @@ function parseJwt(token) {
     }
 }
 
+// Mengecek apakah user telah membeli film
+function hasUserPurchasedFilm(film, userId) {
+    return film.owners.some(owner => owner.id === userId);
+}
+
 // Fetch and display films
 async function fetchAndDisplayFilms(query = '', page = 0) {
     const response = await fetch(`/films?q=${query}`, {
@@ -66,7 +71,12 @@ function displayFilms(films) {
 
     films.forEach(film => {
         const filmCard = document.createElement('div');
-        filmCard.classList.add('bg-white', 'rounded-lg', 'shadow-lg', 'p-4');
+        if (hasUserPurchasedFilm(film, user?.id)) {
+            console.log(`Beli ${film.id}`);
+            filmCard.classList.add('bg-lime', 'rounded-lg', 'shadow-lg', 'p-4');
+        } else {
+            filmCard.classList.add('bg-white', 'rounded-lg', 'shadow-lg', 'p-4');
+        }
 
         filmCard.innerHTML = `
             <img src="${film.cover_image_url}" alt="Film Cover" class="w-full h-48 object-cover rounded">
@@ -82,6 +92,8 @@ function displayFilms(films) {
 // Update pagination controls
 function updatePagination(itemsCount) {
     paginationControls.style.display = itemsCount < itemsPerPage ? 'none' : 'flex';
+    prevPageBtn.style.display = currentPage == 0 ? 'none' : 'block';
+    nextPageBtn.style.display = currentPage > (itemsCount/itemsPerPage) - 1 ? 'none' : 'block'
 }
 
 // View details of a film

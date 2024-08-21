@@ -42,8 +42,4 @@ export class FilmDto {
     @IsString()
     @IsUrl()
     cover_image_url: string;
-
-    @IsString()
-    @IsOptional()
-    ownerId: string;
 }

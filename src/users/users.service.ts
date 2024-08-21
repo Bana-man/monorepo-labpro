@@ -15,17 +15,30 @@ export class UserService {
         return new responseTemp('success', '', data);
     }
 
-    async addOwnerToFilm(userId: string, filmId: string) {
-        const film = await this.prisma.film.update({
+    async addOwnerToFilm(userId: string, filmId: string, userBalance: number) {
+        const film = await this.prisma.film.findUnique({
+            where: {
+                id: filmId,
+            },
+        });
+
+        if (userBalance < film.price) {
+            return new responseTemp('error', 'Your balance is not enough.', null);
+        }
+
+        const updatedFilm = await this.prisma.film.update({
             where: { id: filmId },
             data: {
                 owners: {
                     connect: { id: userId }
                 }
+            },
+            select: {
+                owners: true,
             }
         });
 
-        return new responseTemp('success', 'User added to Film', film);
+        return new responseTemp('success', 'Successfully purchased this film.', updatedFilm);
     }    
 
     async searchUser(

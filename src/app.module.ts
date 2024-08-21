@@ -9,7 +9,7 @@ import { FilmController } from './films/films.controller';
 import { UserController } from './users/users.controller';
 import { UserService } from './users/users.service';
 import { FilmService } from './films/films.service';
-// import { RedisModule } from './redis/redis.module';
+import { RedisModule } from './redis/redis.module';
 
 @Module({
   imports: [
@@ -18,7 +18,7 @@ import { FilmService } from './films/films.service';
     FilmModule, 
     PrismaModule, 
     ConfigModule.forRoot({ isGlobal: true }),
-    // RedisModule,
+    RedisModule,
   ],
   controllers: [
     UserController, FilmController, AppController,

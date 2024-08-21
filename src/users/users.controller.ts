@@ -4,13 +4,15 @@ import { UserService } from './users.service';
 import { GetUser } from 'src/auth/decorator/get-user.decorator';
 import { Roles } from 'src/auth/decorator/roles.decorator';
 import { Role } from '@prisma/client';
-import { FilmService } from 'src/films/films.service';
-// import { RedisService } from 'src/redis/redis.service';
+import { RedisService } from 'src/redis/redis.service';
 
 @Controller('self')
 @UseGuards(AuthGuard)
 export class SelfController {
-    constructor( private userService: UserService ) {}
+    constructor( 
+        private userService: UserService,
+        private redis: RedisService
+    ) {}
     
     @Get()
     getSelf(
@@ -25,13 +27,19 @@ export class SelfController {
         @GetUser('sub') userId: string,
         @Param('id') filmId: string
     ){
-        const film = (await this.userService.addOwnerToFilm(userId, filmId)).data;
-        console.log(film);
+
+        const userBalance = (await this.userService.getUser(userId)).data.balance;
+        const film = await this.userService.addOwnerToFilm(userId, filmId, userBalance);
+
+        if (!film.data) return film; // Balance tidak cukup
+
+        // Balance Cukup
+        this.redis.set(`film:${filmId}`, film.data);
         // Mengubah nilai balance user
-        const data = this.userService.editBalance(userId, -film.price);
-        // this.redis.set('user:${userId}', data);
-        console.log(data);
-        return data;
+        const user = await this.userService.editBalance(userId, -film.data.price);
+        this.redis.set(`user:${userId}`, user.data);
+
+        return film;
     }
 }
 
@@ -41,44 +49,62 @@ export class SelfController {
 export class UserController {
     constructor( 
         private userService: UserService, 
-        // private redis: RedisService 
+        private redis: RedisService 
     ) {}
     @Get()
     async searchUsername(
         @Query('q') username: string
     ) {
-        return this.userService.searchUser(username);
+        if (!username) {
+            const cache = await this.redis.get('users');
+            if (cache) return cache;
+        }
+
+        const data = this.userService.searchUser(username);
+        if (!username) {
+            await this.redis.set('users', data);
+        }
+        return data;
     }
 
     @Get(':id')
     async searchId(
         @Param('id') userId: string
     ) {
-        // const result = await this.redis.get('user:${userId}');
-        // if (result) {
-        //     return result;
-        // }
+        const result = await this.redis.get(`user:${userId}`);
+        if (result) {
+            return result;
+        }
         
-        const data = this.userService.getUser(userId);
-        // this.redis.set('user:${userId}', data);
-        return data;
+        const user = await this.userService.getUser(userId);
+        this.redis.set(`user:${userId}`, user);
+        return user;
     }
 
     @Post(':id/balance')
-    editBalance(
+    async editBalance(
         @Param('id') userId: string,
         @Body('increment', ParseIntPipe) increment: number
     ) {
-        const data = this.userService.editBalance(userId, increment);
-        // this.redis.set('user:${userId}', data);
+        const data = await this.userService.editBalance(userId, increment);
+
+        if (data.status === 'success') {
+            this.redis.set(`user:${userId}`, data);
+            this.redis.del('users');
+        }
         return data;
     }
 
     @Delete(':id')
-    deleteId(
+    async deleteId(
         @Param('id') userId: string
     ) {
-        // this.redis.del('user:${userId}')
-        return this.userService.deleteUser(userId);
+        const data = await this.userService.deleteUser(userId);
+
+        if (data.status === 'success') {
+            this.redis.del(`user:${userId}`);
+            this.redis.del('users');
+        }
+        return data;
     }
 }

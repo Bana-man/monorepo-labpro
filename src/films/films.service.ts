@@ -25,9 +25,9 @@ export class FilmService {
                 },
             });
 
-            return new responseTemp('success', 'Film created', film);
+            return new responseTemp('success', 'Film found', film);
         } catch (error) {
-            return new responseTemp('error', 'Create film failed', null);
+            return new responseTemp('error', 'Film not found', null);
         }
     }
 
@@ -39,9 +39,12 @@ export class FilmService {
                     { director: { contains: q, mode: 'insensitive' }},
                 ]
             },
+            include: {
+                owners: true,
+            }
         })
 
-        // User not found
+        // Film not found
         if (!film) {
             return new responseTemp('error', 'Film not found', null);
         }
@@ -96,7 +99,7 @@ export class FilmService {
 
         console.log(film);
 
-        return new responseTemp('success', 'Film updated', film);
+        return new responseTemp('success', 'Film found', film);
     }
 
     async deleteFilm(id: string) {
@@ -107,7 +110,7 @@ export class FilmService {
                 }
             })
 
-            return new responseTemp('success', 'Film deleted', film);
+            return new responseTemp('success', 'Film found', film);
         } catch {
             return new responseTemp('error', 'Film not found', null);
         }
