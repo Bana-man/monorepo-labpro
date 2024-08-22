@@ -32,7 +32,7 @@ export class FilmController {
             if (cache) return cache;
         }
 
-        const data = this.filmService.searchFilm(q);
+        const data = await this.filmService.searchFilm(q);
         if (!q) {
             await this.redis.set('films', data);
         }
@@ -46,7 +46,7 @@ export class FilmController {
             return result;
         }
         
-        const data = this.filmService.getFilm(filmId);
+        const data = await this.filmService.getFilm(filmId);
         this.redis.set(`film:${filmId}`, data);
         return data;
     }

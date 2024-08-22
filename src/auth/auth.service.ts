@@ -70,6 +70,7 @@ export class AuthService {
         const data = {
             username: user.username,
             token: await this.signToken(user.id, user.username, user.role),
+            balance: user.balance,
         }
         return new responseTemp('success', 'Login success', data);
     }

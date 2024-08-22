@@ -23,6 +23,9 @@ export class FilmService {
                     video_url: dto.video_url,
                     cover_image_url: dto.cover_image_url,
                 },
+                include: {
+                    owners: true,
+                }
             });
 
             return new responseTemp('success', 'Film found', film);
@@ -67,7 +70,6 @@ export class FilmService {
             return new responseTemp('error', 'Film not found', null);
         }
         
-        console.log(film);
         return new responseTemp('success', 'Film found', film);
     }
 
@@ -95,6 +97,9 @@ export class FilmService {
                     set: new Date(),
                 }
             },
+            include: {
+                owners: true,
+            }
         });
 
         console.log(film);

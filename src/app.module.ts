@@ -4,12 +4,8 @@ import { AuthModule } from './auth/auth.module';
 import { FilmModule } from './films/films.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { ConfigModule } from '@nestjs/config';
-import { AppController } from './app.controller';
-import { FilmController } from './films/films.controller';
-import { UserController } from './users/users.controller';
-import { UserService } from './users/users.service';
-import { FilmService } from './films/films.service';
 import { RedisModule } from './redis/redis.module';
+import { PagesModule } from './pages/pages.module';
 
 @Module({
   imports: [
@@ -19,13 +15,7 @@ import { RedisModule } from './redis/redis.module';
     PrismaModule, 
     ConfigModule.forRoot({ isGlobal: true }),
     RedisModule,
-  ],
-  controllers: [
-    UserController, FilmController, AppController,
-  ],
-  providers: [
-    UserService, FilmService,
-  ],
-  
+    PagesModule,
+  ],  
 })
 export class AppModule {}

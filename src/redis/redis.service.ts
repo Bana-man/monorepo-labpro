@@ -8,7 +8,6 @@ export class RedisService {
     async get(key: string) {
         console.log(`GET ${key} from REDIS`);
         const data = await this.cache.get(key);
-        console.log(data);
         if (typeof data === 'string' && data) {
             return JSON.parse(data);
         } 
@@ -18,7 +17,7 @@ export class RedisService {
 
     async set(key: string, value: any) {
         console.log(`SET ${key} from REDIS`);
-        await this.cache.set(key, JSON.stringify(value));
+        await this.cache.set(key, JSON.stringify(value), 10000);
     }
 
     async del(key: string) {

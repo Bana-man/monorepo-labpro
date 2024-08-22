@@ -1,3 +1,4 @@
+let balance = parseInt(localStorage.getItem('balance'));
 const token = localStorage.getItem('Authorization');
 const filmId = localStorage.getItem('selectedFilm');
 const user = parseJwt(token);
@@ -7,6 +8,7 @@ const buyButton = document.getElementById('buy-btn');
 const statusElement = document.getElementById('status');
 const videoSource = document.getElementById('video-source');
 const imageSource = document.getElementById('image-source');
+const userBalance = document.getElementById('userBalance');
 
 const titleText = document.getElementById('titleText');
 const directorText = document.getElementById('directorText');
@@ -19,12 +21,6 @@ const descText = document.getElementById('descText');
 const videoModal = document.getElementById('video-modal');
 const closeModal = document.getElementById('close-modal');
 const body = document.body;
-
-// Show modal on button click
-watchButton.addEventListener('click', () => {
-    videoModal.classList.remove('hidden');
-    body.classList.add('overflow-hidden');
-});
 
 // Close modal on close button click
 closeModal.addEventListener('click', () => {
@@ -84,8 +80,20 @@ async function checkFilmStatus() {
             watchButton.style.display = 'block';
         }
 
+        // Show modal on button click
+        watchButton.addEventListener('click', () => {
+            videoSource.src = result.data.video_url;
+            document.getElementById('film-video').load();
+            videoModal.classList.remove('hidden');
+            body.classList.add('overflow-hidden');
+        });
+
         buyButton.addEventListener('click', () => {
-            handleBuyFilm(result.data);
+            if (balance < result.data.price) {
+                statusElement.textContent = 'Your balance is not enough.';
+            } else {
+                handleBuyFilm(result.data.id);
+            }
         });
 
         // Set film details
@@ -97,36 +105,45 @@ async function checkFilmStatus() {
         descText.textContent        = `${result.data.description}`;    
         
         imageSource.src = result.data.cover_image_url;
-        videoSource.src = result.data.video_url;
     } catch (error) {
         console.error('Error fetching film status:', error);
     }
 }
 
-async function handleBuyFilm(data) {
-    const entry = await fetch(`/users/${user.sub}`, {
+async function handleBuyFilm(filmId) {
+    const data = await fetch(`/self/buy/${filmId}`, {
         method: 'GET',
         headers: {
-            'Content-Type': 'application/json'
-        }
+            'Authorization': `Bearer ${token}`
+        },
     });
-    const result = await entry.json();
+    const result = await data.json();
     console.log(result);
 
-    if (result.data.balance < data.price) {
-        statusElement.textContent = 'Your balance is not enough.';
-    } else {
-        await fetch(`/self/buy/${filmId}`, {
-            method: 'GET',
-            headers: {
-                'Authorization': `Bearer ${token}`
-            },
-        });
-        
-        statusElement.textContent = 'Successfully purchased this film.';
-        buyButton.style.display = 'none';
-        watchButton.style.display = 'block';
-    }
+    console.log(`Balance RES: ${result.data.balance}`);
+    balance = result.data.balance;
+    console.log(`Balance FIN: ${balance}`);
+    userBalance.textContent = `Balance: ${balance}`;
+    localStorage.setItem('balance', balance.toString());
+    statusElement.textContent = 'Successfully purchased this film.';
+    buyButton.style.display = 'none';
+    watchButton.style.display = 'block';
+}
+
+// Check if already login or not
+if (user?.role === 'USER') {
+    authBtn.textContent = 'Logout';
+    authBtn.onclick = () => {
+        localStorage.removeItem('Authorization');
+        localStorage.removeItem('balance');
+        window.location.href = '/login';
+    };
+    userBalance.textContent = `Balance: ${balance}`;
+} else {
+    authBtn.textContent = 'Login';
+    authBtn.onclick = () => {
+        window.location.href = '/login';
+    };
 }
 
 // Check film status on page load

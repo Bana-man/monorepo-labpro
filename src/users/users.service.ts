@@ -15,17 +15,17 @@ export class UserService {
         return new responseTemp('success', '', data);
     }
 
-    async addOwnerToFilm(userId: string, filmId: string, userBalance: number) {
-        const film = await this.prisma.film.findUnique({
-            where: {
-                id: filmId,
-            },
-        });
+    async getBalance(userId: string) {
+        const user = await this.prisma.user.findUnique({
+            where: { id: userId },
+            select: {
+                balance: true,
+            }
+        })
+        return new responseTemp('success', '', user.balance);
+    }
 
-        if (userBalance < film.price) {
-            return new responseTemp('error', 'Your balance is not enough.', null);
-        }
-
+    async addOwnerToFilm(userId: string, filmId: string) {
         const updatedFilm = await this.prisma.film.update({
             where: { id: filmId },
             data: {
@@ -33,13 +33,45 @@ export class UserService {
                     connect: { id: userId }
                 }
             },
-            select: {
+            include: {
                 owners: true,
             }
         });
+        console.log("ADD OWNER");
+        console.log(updatedFilm);
 
         return new responseTemp('success', 'Successfully purchased this film.', updatedFilm);
     }    
+
+    async getBoughtFilm(userId: string, q: string) {
+        const films = await this.prisma.film.findMany({
+            where: {
+                AND: [
+                    {
+                        owners: {
+                            some: {
+                                id: userId
+                            }
+                        }
+                    },{
+                        OR: [
+                            { title: { contains: q, mode: 'insensitive' }},
+                            { director: { contains: q, mode: 'insensitive' }},
+                        ]
+                    }
+
+                ]
+            },
+        });
+        console.log("AAAAAAAAAAAA");
+        console.log(films);
+        // User not found
+        if (!films) {
+            return new responseTemp('error', 'Film not found', null);
+        }
+        
+        return new responseTemp('success', 'Film found', films);
+    }
 
     async searchUser(
         q: string
@@ -93,6 +125,7 @@ export class UserService {
         userId: string,
         increment: number,
     ) {
+        console.log(`Incre: ${increment}`)
         try {
             const user = await this.prisma.user.update({
                 where: {
@@ -100,7 +133,7 @@ export class UserService {
                 },
                 data: {
                     balance: {
-                        increment: increment
+                        increment: increment,
                     },
                 },
             })

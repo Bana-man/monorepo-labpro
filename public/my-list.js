@@ -25,16 +25,13 @@ function parseJwt(token) {
     }
 }
 
-// Mengecek apakah user telah membeli film
-function hasUserPurchasedFilm(film, userId) {
-    return film.owners.some(owner => owner.id === userId);
-}
-
 // Fetch and display films
 async function fetchAndDisplayFilms(query = '', page = 0) {
-    const response = await fetch(`/films?q=${query}`, {
+    const response = await fetch(`/self/my-film?q=${query}`, {
         method: 'GET',
-        headers: { },
+        headers: {
+            'Authorization': `Bearer ${token}`
+         },
     });
     
     if (!response.ok) {
@@ -75,21 +72,14 @@ function displayFilms(films) {
 
     films.forEach(film => {
         const filmCard = document.createElement('div');
-        if (hasUserPurchasedFilm(film, user?.id)) {
-            console.log(`Beli ${film.id}`);
-            filmCard.classList.add('bg-lime', 'rounded-lg', 'shadow-lg', 'p-4');
-        } else {
-            filmCard.classList.add('bg-white', 'rounded-lg', 'shadow-lg', 'p-4');
-        }
 
+        filmCard.classList.add('bg-white', 'rounded-lg', 'shadow-lg', 'p-4');
         filmCard.innerHTML = `
-            <div class="snap-start ...">
-                <img src="${film.cover_image_url}" alt="Film Cover" class="w-full h-48 object-cover rounded">
-                <h3 class="text-lg font-semibold mt-4">${film.title}</h3>
-                <p class="text-sm text-gray-600">Director: ${film.director}</p>
-                <p class="text-sm text-gray-600">Price: ${film.price}</p>
-                <button class="mt-4 bg-indigo-600 text-white p-2 rounded-md w-full" onclick="viewDetails('${film.id}')">Detail</button>
-            </div>
+            <img src="${film.cover_image_url}" alt="Film Cover" class="w-full h-48 object-cover rounded">
+            <h3 class="text-lg font-semibold mt-4">${film.title}</h3>
+            <p class="text-sm text-gray-600">Director: ${film.director}</p>
+            <p class="text-sm text-gray-600">Price: ${film.price}</p>
+            <button class="mt-4 bg-indigo-600 text-white p-2 rounded-md w-full" onclick="viewDetails('${film.id}')">Detail</button>
         `;
 
         filmsContainer.appendChild(filmCard);

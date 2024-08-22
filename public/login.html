@@ -9,7 +9,7 @@
 <body class="bg-gray-100 flex items-center justify-center h-screen">
   <div class="w-full max-w-md">
     <h2 class="text-center text-2xl font-bold mb-6">Login</h2>
-    <form id="loginForm" class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
+    <form id="loginForm" class="bg-white shadow-md rounded px-8 scroll-pt-6 pb-8 mb-4">
       <div class="mb-4">
         <label class="block text-gray-700 text-sm font-bold mb-2" for="username">Username</label>
         <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="username" type="text" placeholder="Username">
@@ -27,32 +27,6 @@
     <p id="statusMessage" class="text-center text-red-500"></p>
   </div>
 
-  <script>
-    async function loginUser() {
-      const username = document.getElementById('username').value;
-      const password = document.getElementById('password').value;
-
-      const response = await fetch('/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ username, password }),
-      });
-      
-      const result = await response.json();
-      const outputDiv = document.getElementById('outputMessage');
-
-      if (response.ok && result.status === 'success') {
-        localStorage.setItem('Authorization', result.data.token); // Store the JWT token
-        statusMessage.textContent = 'Login successful!';
-        statusMessage.classList.remove('text-red-500');
-        statusMessage.classList.add('text-green-500');
-        window.location.href = '/dashboard';
-      } else {
-        statusMessage.textContent = result.message || 'Login failed!';
-      }
-    }
-  </script>
+  <script src="/login.js"></script>
 </body>
 </html>

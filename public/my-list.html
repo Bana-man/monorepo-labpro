@@ -3,23 +3,39 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My List</title>
+    <title>My List - Nelfix</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="styles.css" rel="stylesheet">
 </head>
 <body class="bg-gray-100">
 
-    <div class="container mx-auto p-8">
-        <h2 class="text-3xl font-bold mb-6 text-center">My List</h2>
-        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            <!-- Purchased film cards will go here -->
-            <div class="bg-white rounded-lg shadow-lg p-4">
-                <img src="https://via.placeholder.com/150" alt="Film Cover" class="w-full h-48 object-cover rounded">
-                <h3 class="text-lg font-semibold mt-4">Film Title</h3>
-                <p class="text-sm text-gray-600">Director: John Doe</p>
-                <button class="mt-4 bg-indigo-600 text-white p-2 rounded-md w-full">Watch</button>
-            </div>
+    <!-- Navbar -->
+    <nav class="navbar bg-blue-500 p-4 fixed top-0 left-0 right-0 z-50 flex justify-between items-center">
+        <div class="text-white font-bold text-xl">Nelfix</div>
+        <div class="flex space-x-4">
+            <p id="userBalance" class="text-white font-bold text-sm"></p>
+            <a href="/my-list" class="btn">MyFilm</a>
+            <a href="/dashboard" class="btn">Dashboard</a>
+            <button id="authBtn" class="btn bg-red-500">Loading...</button>
         </div>
+    </nav>
+
+    <!-- Search Input -->
+    <div class="search-bar bg-white p-4 fixed top-16 left-0 right-0 z-40 shadow-md">
+        <input id="filmSearch" type="text" placeholder="Search Films" class="w-full p-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500">
     </div>
 
+    <!-- Main Content -->
+    <div id="filmsContainer" class="container mx-auto p-8 scroll-pt-38 pb-20 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+        <!-- Film cards will be dynamically inserted here -->
+    </div>
+
+    <!-- Pagination Buttons -->
+    <div id="paginationControls" class="pagination fixed bottom-0 left-0 right-0 bg-white p-4 flex justify-center z-50 shadow-md">
+        <button id="prevPage" class="pagination-btn">Previous</button>
+        <button id="nextPage" class="pagination-btn">Next</button>
+    </div>
+
+    <script src="my-list.js"></script>
 </body>
 </html>

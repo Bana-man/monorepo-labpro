@@ -18,7 +18,11 @@ export class AuthController {
     }
 
     @Post('login')
-    login(@Body() dto: LoginAuthDto) {
-        return this.authService.login(dto);
+    async login(@Body() dto: LoginAuthDto) {
+        const data = await this.authService.login(dto);
+        if (data.status == 'success') {
+            this.redis.del('my-film');
+        }
+        return data;
     }
 }

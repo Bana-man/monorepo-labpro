@@ -1,0 +1,37 @@
+/* Styles for the buttons */
+.btn {
+    padding: 0.5rem 1rem;
+    border-radius: 0.25rem;
+    background-color: #2563eb;
+    color: #ffffff;
+    text-decoration: none;
+    transition: background-color 0.2s;
+}
+
+.btn:hover {
+    background-color: #1e40af;
+}
+
+/* Pagination button styling */
+.pagination-btn {
+    padding: 0.5rem 1rem;
+    background-color: #2563eb;
+    color: #ffffff;
+    border-radius: 0.25rem;
+    margin: 0 0.5rem;
+    transition: background-color 0.2s;
+}
+
+.pagination-btn:hover {
+    background-color: #1e40af;
+}
+
+.modal-bg {
+    background-color: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(10px);
+}
+
+#filmsContainer {
+    padding-top: 152px;
+    scroll-snap-type: start;
+}

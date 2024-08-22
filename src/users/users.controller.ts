@@ -22,24 +22,49 @@ export class SelfController {
         return this.userService.getSelf(username, token);
     }
 
+    @Get('balance')
+    getBalance(
+        @GetUser('sub') userId: string,
+    ) {
+        return this.userService.getBalance(userId);
+    }
+
     @Get('buy/:id')
     async buyFilm(
         @GetUser('sub') userId: string,
         @Param('id') filmId: string
     ){
-
-        const userBalance = (await this.userService.getUser(userId)).data.balance;
-        const film = await this.userService.addOwnerToFilm(userId, filmId, userBalance);
-
-        if (!film.data) return film; // Balance tidak cukup
-
-        // Balance Cukup
+        const film = await this.userService.addOwnerToFilm(userId, filmId);
         this.redis.set(`film:${filmId}`, film.data);
+        
         // Mengubah nilai balance user
         const user = await this.userService.editBalance(userId, -film.data.price);
         this.redis.set(`user:${userId}`, user.data);
+        this.redis.del(`my-film`);
 
-        return film;
+        console.log(user)
+        return user;
+    }
+
+    @Get('my-film')
+    async boughtFilm(
+        @GetUser('sub') userId: string,
+        @Query('q') q: string
+    ) {
+        if (!q) {
+            const cache = await this.redis.get('my-film');
+            if (cache) return cache;
+        }
+
+        const cache = await this.redis.get('my-film');
+        if (cache) return cache;
+
+        const data = await this.userService.getBoughtFilm(userId, q);
+
+        if (!q) {
+            await this.redis.set('my-film', data);
+        }
+        return data;
     }
 }
 
@@ -60,7 +85,7 @@ export class UserController {
             if (cache) return cache;
         }
 
-        const data = this.userService.searchUser(username);
+        const data = await this.userService.searchUser(username);
         if (!username) {
             await this.redis.set('users', data);
         }
