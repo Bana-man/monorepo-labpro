@@ -5,6 +5,12 @@ import * as fs from 'fs';
 
 @Controller()
 export class AppController {
+  @Get('/')
+  getHome(
+    @Res() res: Response, 
+  ) {
+    return res.redirect('/dashboard');
+  }
   @Get('/:page')
   getPage(
     @Res() res: Response, 
