@@ -8,7 +8,7 @@ import { responseTemp } from 'src/response/response';
 export class FilmService {
     constructor( private prisma: PrismaService ) {}
 
-    async createFilm(dto: FilmDto) {
+    async createFilm(dto: FilmDto, video: string, cover_image?: string) {
         try {
             // Create film in database
             const film = await this.prisma.film.create({
@@ -20,8 +20,8 @@ export class FilmService {
                     genre: dto.genre,
                     price: dto.price,
                     duration: dto.duration,
-                    video_url: dto.video_url,
-                    cover_image_url: dto.cover_image_url,
+                    video_url: video,
+                    cover_image_url: cover_image,
                 },
                 include: {
                     owners: true,

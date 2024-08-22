@@ -1,11 +1,12 @@
-import { Body, Controller, Get, Put, Param, Post, Query, UseGuards, Delete } from '@nestjs/common';
+import { Body, Controller, Get, Put, Param, Post, Query, UseGuards, Delete, UseInterceptors, UploadedFiles } from '@nestjs/common';
 import { FilmService } from './films.service';
 import { FilmDto } from './dto';
-import { GetUser } from 'src/auth/decorator/get-user.decorator';
 import { Role, User } from '@prisma/client';
 import { AuthGuard, RolesGuard } from 'src/auth/guard';
 import { Roles } from 'src/auth/decorator/roles.decorator';
 import { RedisService } from 'src/redis/redis.service';
+import { FileFieldsInterceptor } from '@nestjs/platform-express'
+import { join } from 'path';
 
 @Controller('films')
 export class FilmController {
@@ -17,8 +18,24 @@ export class FilmController {
     @UseGuards(AuthGuard, RolesGuard)
     @Roles(Role.ADMIN)
     @Post()
-    async createFilm( @Body() dto: FilmDto ) {
-        const data = await this.filmService.createFilm(dto);
+    @UseInterceptors(FileFieldsInterceptor([
+        { name: 'cover_image', maxCount: 1 },
+        { name: 'video', maxCount: 1 },
+      ]))
+    async createFilm( 
+        @Body() dto: FilmDto,
+        @UploadedFiles() files: { cover_image?: Express.Multer.File[], video?: Express.Multer.File[] },
+    ) {
+        const coverImage = files.cover_image?.[0];
+        const video = files.video?.[0];
+
+        console.log('Cover Image Path:', coverImage?.path);
+        console.log('Video Path:', video?.path);
+        
+        const data = await this.filmService.createFilm(
+            dto, 
+            coverImage ? join('uploads', coverImage.filename) : null,
+            video ? join('uploads', video.filename) : null);
         if (data.status === 'success') {
             this.redis.del('films');
             this.redis.set(`film:${data.data.id}`, data);

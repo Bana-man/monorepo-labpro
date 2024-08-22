@@ -6,9 +6,14 @@ import { PrismaModule } from './prisma/prisma.module';
 import { ConfigModule } from '@nestjs/config';
 import { RedisModule } from './redis/redis.module';
 import { PagesModule } from './pages/pages.module';
+import { MulterModule } from '@nestjs/platform-express';
+import { join } from 'path';
 
 @Module({
   imports: [
+    MulterModule.register({
+      dest: join(__dirname, '..', 'public/uploads'),
+    }),
     UserModule, 
     AuthModule, 
     FilmModule, 

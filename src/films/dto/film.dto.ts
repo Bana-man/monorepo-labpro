@@ -18,8 +18,6 @@ export class FilmDto {
     release_year: number;
 
     @IsArray()
-    @ArrayNotEmpty()
-    @ArrayMinSize(1)
     @IsString({ each: true })
     genre: string[];
 
@@ -32,14 +30,4 @@ export class FilmDto {
     @IsNumber()
     @IsPositive()
     duration: number;
-
-    @IsNotEmpty()
-    @IsString()
-    @IsUrl()
-    video_url: string;
-
-    @IsOptional()
-    @IsString()
-    @IsUrl()
-    cover_image_url: string;
 }
