@@ -73,20 +73,20 @@ export class FilmService {
         return new responseTemp('success', 'Film found', film);
     }
 
-    async updateFilm(id: string, dto: FilmDto) {
+    async updateFilm(id: string, dto: FilmDto, cover_image?: string, video?: string) {
         const existingFilm = await this.prisma.film.findUnique({ where: { id } });
         if (!existingFilm) {
             return new responseTemp('error', 'Film not found', null);
         }
 
         // Handle video file upload
-        if (!dto.video_url) {
-            dto.video_url = existingFilm.video_url;
+        if (!video) {
+            video = existingFilm.video_url;
         }
 
         // Handle cover image upload
-        if (!dto.cover_image_url) {
-            dto.cover_image_url = existingFilm.cover_image_url;
+        if (!cover_image) {
+            cover_image = existingFilm.cover_image_url;
         }
 
         const film = await this.prisma.film.update({

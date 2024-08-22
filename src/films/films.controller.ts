@@ -24,14 +24,17 @@ export class FilmController {
       ]))
     async createFilm( 
         @Body() dto: FilmDto,
-        @UploadedFiles() files: { cover_image?: Express.Multer.File[], video?: Express.Multer.File[] },
+        @UploadedFiles() files: { 
+            cover_image: Express.Multer.File[], 
+            video: Express.Multer.File[] 
+        },
     ) {
         const coverImage = files.cover_image?.[0];
         const video = files.video?.[0];
 
         console.log('Cover Image Path:', coverImage?.path);
         console.log('Video Path:', video?.path);
-        
+
         const data = await this.filmService.createFilm(
             dto, 
             coverImage ? join('uploads', coverImage.filename) : null,
@@ -71,8 +74,30 @@ export class FilmController {
     @UseGuards(AuthGuard, RolesGuard)
     @Roles(Role.ADMIN)
     @Put(':id')
-    async updateFilm(@Param('id') filmId:string, @Body() dto: FilmDto) {
-        const data = await this.filmService.updateFilm(filmId, dto)
+    @UseInterceptors(FileFieldsInterceptor([
+        { name: 'cover_image', maxCount: 1 },
+        { name: 'video', maxCount: 1 },
+      ]))
+    async updateFilm(
+        @Param('id') filmId:string, 
+        @Body() dto: FilmDto,
+        @UploadedFiles() files: { 
+            cover_image?: Express.Multer.File[], 
+            video?: Express.Multer.File[] 
+        },
+    ) {
+        const coverImage = files.cover_image?.[0];
+        const video = files.video?.[0];
+
+        console.log('Cover Image Path:', coverImage?.path);
+        console.log('Video Path:', video?.path);
+
+        const data = await this.filmService.updateFilm(
+            filmId, 
+            dto, 
+            coverImage ? join('uploads', coverImage.filename) : null,
+            video ? join('uploads', video.filename) : null,
+        )
         
         if (data.status === 'success') {
             this.redis.set(`film:${filmId}`, data);

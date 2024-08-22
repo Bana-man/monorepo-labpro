@@ -46,8 +46,8 @@ async function main() {
           genre: ['Gen1', 'Gen2'],
           price: 100,
           duration: 100,
-          video_url: '/uploads/videos/video1.mp4',
-          cover_image_url: '/uploads/cover_images/image1.jpg',
+          video_url: '/uploads/video1.mp4',
+          cover_image_url: '/uploads/image1.jpg',
         },
         {
           title: 'EFGHIJ',
@@ -55,10 +55,9 @@ async function main() {
           director: 'XMan',
           releaseYear: 2024,
           genre: ['Rawr'],
-          price: 120,
+          price: i*10,
           duration: 200,
-          video_url: '/uploads/videos/video1.mp4',
-          cover_image_url: '/uploads/cover_images/image1.jpg',
+          video_url: '/uploads/video1.mp4',
         },
       ]
     })

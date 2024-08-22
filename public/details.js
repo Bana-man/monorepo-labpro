@@ -112,7 +112,7 @@ async function checkFilmStatus() {
 
 async function handleBuyFilm(filmId) {
     const data = await fetch(`/self/buy/${filmId}`, {
-        method: 'GET',
+        method: 'PUT',
         headers: {
             'Authorization': `Bearer ${token}`
         },

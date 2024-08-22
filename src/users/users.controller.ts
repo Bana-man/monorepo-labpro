@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Headers, Param, ParseIntPipe, Post, Query, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Headers, Param, ParseIntPipe, Post, Put, Query, UseGuards } from '@nestjs/common';
 import { AuthGuard, RolesGuard } from 'src/auth/guard';
 import { UserService } from './users.service';
 import { GetUser } from 'src/auth/decorator/get-user.decorator';
@@ -29,7 +29,7 @@ export class SelfController {
         return this.userService.getBalance(userId);
     }
 
-    @Get('buy/:id')
+    @Put('buy/:id')
     async buyFilm(
         @GetUser('sub') userId: string,
         @Param('id') filmId: string
